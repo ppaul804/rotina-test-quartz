@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-RotinaTestQuartzApplication<rotina-test-quartz>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "br.com.ppaul804.rotinatestquartz.RotinaTestQuartzApplication",
+            "projectName": "rotina-test-quartz",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
