@@ -42,9 +42,7 @@ public class QuartzConfig {
     public Trigger createTriggerBean(JobDetail jobDetail) {
         return TriggerBuilder.newTrigger()
                 .forJob(jobDetail)
-                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                        .withIntervalInSeconds(5)
-                        .withRepeatCount(10))
+                .withSchedule(CronScheduleBuilder.cronSchedule("0/5 * * ? * * *"))
                 .build();
     }
 
