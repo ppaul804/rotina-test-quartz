@@ -1,80 +1,58 @@
 package br.com.ppaul804.rotinatestquartz.config;
 
 import br.com.ppaul804.rotinatestquartz.job.LoadBookJob;
-import org.quartz.JobDetail;
-import org.quartz.Trigger;
-import org.quartz.spi.TriggerFiredBundle;
+import org.quartz.*;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.quartz.*;
-
-import java.util.concurrent.TimeUnit;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 
 @Configuration
 public class QuartzConfig {
 
-    final ApplicationContext applicationContext;
-
-    public QuartzConfig(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
-
     /**
-     * Adds the capability in the Scheduler to weave the beans with spring context.
+     * Creates a SpringBeanJobFactory with the capability on the Scheduler to weave
+     * the beans in the spring context.
      * 
+     * @param applicationContext
      * @return SpringBeanJobFactory
      */
     @Bean
-    SpringBeanJobFactory createSpringBeanJobFactory() {
-        return new SpringBeanJobFactory() {
-            @Override
-            protected Object createJobInstance(final TriggerFiredBundle bundle) throws Exception {
-                final Object job = super.createJobInstance(bundle);
-                applicationContext.getAutowireCapableBeanFactory().autowireBean(job);
-                return job;
-            }
-        };
+    public SpringBeanJobFactory createSpringBeanJobFactory(ApplicationContext applicationContext) {
+        AutoWiringSpringBeanJobFactory jobFactory = new AutoWiringSpringBeanJobFactory();
+        jobFactory.setApplicationContext(applicationContext);
+        return jobFactory;
     }
 
     /**
-     * Creates a SchedulerFactoryBean bean with the springBeanJobFactory given.
+     * Creates a SchedulerFactoryBean with auto-wiring support to quartz jobs.
      * 
-     * @param springBeanJobFactory
-     * @param trigger
+     * @param applicationContext
      * @return SchedulerFactoryBean
      */
-    @Bean
-    public SchedulerFactoryBean createSchedulerFactory(SpringBeanJobFactory springBeanJobFactory, Trigger trigger) {
+    public SchedulerFactoryBean createSchedulerFactory(ApplicationContext applicationContext) {
         SchedulerFactoryBean schedulerFactory = new SchedulerFactoryBean();
-
-        schedulerFactory.setAutoStartup(true);
-        schedulerFactory.setWaitForJobsToCompleteOnShutdown(true);
-        schedulerFactory.setTriggers(trigger);
-
-        springBeanJobFactory.setApplicationContext(applicationContext);
-        schedulerFactory.setJobFactory(springBeanJobFactory);
-
+        schedulerFactory.setJobFactory(createSpringBeanJobFactory(applicationContext));
         return schedulerFactory;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     @Bean
-    public SimpleTriggerFactoryBean createSimpleTriggerFactoryBean(JobDetail jobDetail) {
-        SimpleTriggerFactoryBean simpleTriggerFactory = new SimpleTriggerFactoryBean();
-
-        simpleTriggerFactory.setJobDetail(jobDetail);
-        simpleTriggerFactory.setStartDelay(0);
-        simpleTriggerFactory.setRepeatInterval(TimeUnit.SECONDS.toMillis(5));
-        simpleTriggerFactory.setRepeatCount(10);
-        return simpleTriggerFactory;
+    public Trigger createTriggerBean(JobDetail jobDetail) {
+        return TriggerBuilder.newTrigger()
+                .forJob(jobDetail)
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                        .withIntervalInSeconds(5)
+                        .withRepeatCount(10))
+                .build();
     }
 
     @Bean
-    public JobDetailFactoryBean createJobDetailFactoryBean() {
-        JobDetailFactoryBean jobDetailFactory = new JobDetailFactoryBean();
-
-        jobDetailFactory.setJobClass(LoadBookJob.class);
-        return jobDetailFactory;
+    public JobDetail createJobDetailBean() {
+        return JobBuilder.newJob()
+                .storeDurably()
+                .ofType(LoadBookJob.class)
+                .build();
     }
 }
