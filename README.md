@@ -27,3 +27,5 @@ For further reference, please consider the following sections:
 * [Create an OCI image](https://docs.spring.io/spring-boot/docs/2.7.4/maven-plugin/reference/html/#build-image)
 * [Quartz Scheduler](https://docs.spring.io/spring-boot/docs/2.7.4/reference/htmlsingle/#io.quartz)
 * [Based at Quartz Scheduler with SpringBoot](https://medium.com/@manvendrapsingh/quartz-scheduling-in-springboot-7cea1b7b19e7)
+* [Scheduling in Spring with Quartz](https://www.baeldung.com/spring-quartz-schedule)
+* [Cron Expression Generator & Explainer - Quartz](https://www.freeformatter.com/cron-expression-generator-quartz.html)
