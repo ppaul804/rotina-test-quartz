@@ -1,0 +1,5 @@
+{"properties": [{
+  "name": "rut.cron.expression",
+  "type": "java.lang.String",
+  "description": "Expressão em cron da rotina"
+}]}

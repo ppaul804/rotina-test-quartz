@@ -2,6 +2,7 @@ package br.com.ppaul804.rotinatestquartz.config;
 
 import br.com.ppaul804.rotinatestquartz.job.LoadBookJob;
 import org.quartz.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +11,9 @@ import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 
 @Configuration
 public class QuartzConfig {
+
+    @Value("${rut.cron.expression}")
+    private String cronExpression;
 
     /**
      * Creates a SpringBeanJobFactory with the capability on the Scheduler to weave
@@ -42,7 +46,7 @@ public class QuartzConfig {
     public Trigger createTriggerBean(JobDetail jobDetail) {
         return TriggerBuilder.newTrigger()
                 .forJob(jobDetail)
-                .withSchedule(CronScheduleBuilder.cronSchedule("0/5 * * ? * * *"))
+                .withSchedule(CronScheduleBuilder.cronSchedule(cronExpression))
                 .build();
     }
 
